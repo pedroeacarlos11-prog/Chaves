@@ -2,138 +2,114 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Api\V1\UsuarioResource;
-use App\Models\TokenUsuario;
 use App\Models\Usuario;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
 class UsuarioController extends Controller
 {
-    public function login(Request $request): JsonResponse
+    public function salvar_usuario(Request $request)
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'senha' => ['required', 'string'],
-            'device_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:usuario',
+            'senha' => 'required|string|',
+            'cpf' => 'required|string|unique:usuario',
+            'data_nascimento' => 'required|date',
         ]);
 
-        $usuario = Usuario::query()->where('email', $validated['email'])->first();
+        try {
+            $usuario = new Usuario;
+            $usuario->nome = $request->nome;
+            $usuario->email = $request->email;
+            $usuario->senha = Hash::make($request->senha);
+            $usuario->cpf = $request->cpf;
+            $usuario->data_nascimento = $request->data_nascimento;
 
-        $storedPassword = (string) ($usuario?->senha ?? '');
-        $isLegacyMd5 = preg_match('/\A[a-f0-9]{32}\z/i', $storedPassword) === 1;
-        $passwordIsValid = $usuario && ($isLegacyMd5
-            ? hash_equals(strtolower($storedPassword), md5($validated['senha']))
-            : Hash::check($validated['senha'], $storedPassword));
+            $usuario->save();
 
-        if (! $passwordIsValid) {
-            throw ValidationException::withMessages([
-                'email' => ['E-mail ou senha inválidos.'],
-            ]);
+            return response()->json(['message' => 'Usuário cadastrado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao cadastrar usuário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
         }
+    }
 
-        if ($isLegacyMd5) {
-            $usuario->update([
-                'senha' => Hash::make($validated['senha']),
-            ]);
+    public function ver_usuario(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+        $usuario = Usuario::find($request->id);
+        if ($usuario) {
+            return response()->json(['usuario' => $usuario, 'erro' => 'n'], 200);
+        } else {
+            return response()->json(['message' => 'Usuário não encontrado!', 'erro' => 's'], 200);
         }
-
-        $expiresAt = now()->addDays(30);
-        $newAccessToken = $usuario->createToken(
-            ($validated['device_name'] ?? null) ?: 'api',
-            ['*'],
-            $expiresAt,
-        );
-
-        TokenUsuario::create([
-            'usuario_id' => $usuario->getKey(),
-            'token' => $newAccessToken->accessToken->token,
-            'valido_ate' => $expiresAt,
-        ]);
-
-        return response()->json([
-            'access_token' => $newAccessToken->plainTextToken,
-            'token_type' => 'Bearer',
-            'expires_at' => $expiresAt->toISOString(),
-            'usuario' => (new UsuarioResource($usuario))->resolve($request),
-        ]);
     }
 
-    public function index(): AnonymousResourceCollection
+    public function listar_usuarios(Request $request)
     {
-        return UsuarioResource::collection(
-            Usuario::query()->orderBy('nome')->orderBy('id')->paginate(),
-        );
+        $usuarios = Usuario::all();
+
+        return response()->json(['usuarios' => $usuarios], 200);
     }
 
-    public function store(Request $request): JsonResponse
+    public function listar_usuarios_simples(Request $request)
     {
-        $validated = $request->validate([
-            'nome' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('mysql_laravel.usuario', 'email')],
-            'senha' => ['required', 'string', 'min:8'],
-            'cpf' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'data_nascimento' => ['required', 'date'],
+        $usuarios = Usuario::select('nome', 'email')->get();
+
+        return response()->json(['usuarios' => $usuarios], 200);
+    }
+
+    public function alterar_usuario(Request $request)
+    {
+
+        $request->validate([
+            'id' => 'required|integer|exists:usuario,id',
+            'nome' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|',
+            'senha' => 'required|string|',
+            'cpf' => 'required|string|unique:usuario',
+            'data_nascimento' => 'required|date',
         ]);
 
-        $validated['senha'] = Hash::make($validated['senha']);
-        $usuario = Usuario::create($validated);
+        try {
 
-        return (new UsuarioResource($usuario))->response()->setStatusCode(201);
-    }
+            $usuario = Usuario::find($request->id);
 
-    public function show(Usuario $usuario): UsuarioResource
-    {
-        return new UsuarioResource($usuario);
-    }
+            if ($usuario->email != $request->cpf) {
+                $usuario_email_igual = Usuario::where('email', $request->email)->first();
+                if ($usuario_email_igual) {
+                    return response()->json(['message' => 'Email já cadastrado!', 'erro' => 's'], 200);
+                }
+            }
+            $usuario->nome = $request->nome;
+            $usuario->email = $request->email;
+            $usuario->senha = Hash::make($request->senha);
+            $usuario->cpf = $request->cpf;
+            $usuario->data_nascimento = $request->data_nascimento;
 
-    public function update(Request $request, Usuario $usuario): UsuarioResource
-    {
-        $validated = $request->validate([
-            'nome' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => [
-                'sometimes',
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('mysql_laravel.usuario', 'email')->ignore($usuario->getKey()),
-            ],
-            'senha' => ['sometimes', 'required', 'string', 'min:8'],
-            'cpf' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'data_nascimento' => ['sometimes', 'required', 'date'],
-        ]);
+            $usuario->save();
 
-        if (isset($validated['senha'])) {
-            $validated['senha'] = Hash::make($validated['senha']);
+            return response()->json(['message' => 'Usuário alterado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao alterar usuário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
         }
-
-        $usuario->update($validated);
-
-        return new UsuarioResource($usuario->refresh());
     }
 
-    public function destroy(Usuario $usuario): Response
+    public function deletar_usuario(Request $request)
     {
-        $usuario->delete();
-
-        return response()->noContent();
-    }
-
-    public function ver_usuario(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'id' => ['required', 'integer', 'exists:mysql_laravel.usuario,id'],
+        $request->validate([
+            'id' => 'required|integer|exists:usuario,id',
         ]);
 
-        $usuario = Usuario::findOrFail($validated['id']);
+        try {
+            $usuario = Usuario::find($request->id);
+            $usuario->delete();
 
-        return response()->json([
-            'usuario' => (new UsuarioResource($usuario))->resolve($request),
-        ]);
+            return response()->json(['message' => 'Usuário deletado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao deletar usuário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
+        }
     }
 }

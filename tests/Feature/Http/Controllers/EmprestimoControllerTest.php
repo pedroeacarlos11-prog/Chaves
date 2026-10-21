@@ -49,6 +49,10 @@ class EmprestimoControllerTest extends TestCase
             'chave_id' => $chave->id,
             'data_retirada' => '2026-02-10',
         ]);
+        $this->assertDatabaseHas('chave', [
+            'id' => $chave->id,
+            'status' => 'Emprestada',
+        ]);
     }
 
     public function test_shows_emprestimo(): void
@@ -78,6 +82,28 @@ class EmprestimoControllerTest extends TestCase
             'status' => 'Devolvido',
             'data_devolucao' => '2026-02-10',
         ]);
+        $this->assertDatabaseHas('chave', [
+            'id' => $emprestimo->chave_id,
+            'status' => 'Disponível',
+        ]);
+    }
+
+    public function test_returns_422_when_a_key_already_has_an_active_emprestimo(): void
+    {
+        $this->authenticateAsUsuario();
+        $funcionario = Funcionario::factory()->create();
+        $chave = Chave::factory()->create();
+        Emprestimo::factory()->create(['chave_id' => $chave->id]);
+
+        $response = $this->postJson('/api/v1/emprestimos', [
+            'funcionario_id' => $funcionario->id,
+            'chave_id' => $chave->id,
+            'data_retirada' => '2026-02-11',
+            'hora_retirada' => '09:30',
+        ]);
+
+        $response->assertUnprocessable()->assertJsonValidationErrors(['chave_id']);
+        $this->assertSame(1, Emprestimo::query()->where('chave_id', $chave->id)->count());
     }
 
     public function test_deletes_emprestimo_and_returns_204(): void

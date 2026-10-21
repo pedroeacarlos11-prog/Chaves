@@ -63,6 +63,36 @@ class UsuarioControllerTest extends TestCase
         $response->assertOk()->assertJsonPath('usuario.id', $usuario->id);
     }
 
+    public function test_legacy_named_usuario_crud_methods_use_the_model(): void
+    {
+        $this->authenticateAsUsuario();
+
+        $created = $this->postJson('/api/v1/salvar_usuario', [
+            'nome' => 'Usuário pelo método legado',
+            'email' => 'usuario.legado@example.test',
+            'senha' => 'Senha123!',
+            'cpf' => '12345678900',
+            'data_nascimento' => '2000-01-15',
+        ])->assertCreated();
+        $usuarioId = $created->json('data.id');
+
+        $this->getJson('/api/v1/ver_usuario?id='.$usuarioId)
+            ->assertOk()
+            ->assertJsonPath('usuario.id', $usuarioId);
+
+        $this->putJson('/api/v1/alterar_usuario', [
+            'id' => $usuarioId,
+            'nome' => 'Usuário alterado pelo método legado',
+            'email' => 'usuario.alterado@example.test',
+            'senha' => 'NovaSenha123!',
+            'cpf' => '12345678900',
+            'data_nascimento' => '2000-01-15',
+        ])->assertOk()->assertJsonPath('data.nome', 'Usuário alterado pelo método legado');
+
+        $this->deleteJson('/api/v1/deletar_usuario', ['id' => $usuarioId])->assertNoContent();
+        $this->assertDatabaseMissing('usuario', ['id' => $usuarioId]);
+    }
+
     public function test_updates_usuario_and_hashes_a_changed_password(): void
     {
         $this->authenticateAsUsuario();

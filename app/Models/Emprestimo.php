@@ -11,13 +11,9 @@ class Emprestimo extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
     protected $table = 'emprestimo';
 
-    protected $attributes = [
-        'status' => 'Em andamento',
-    ];
+    public $timestamps = false;
 
     protected $fillable = [
         'funcionario_id',

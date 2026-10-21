@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('token_usuario', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('usuario_id')->constrained('usuario')->cascadeOnDelete();
-            $table->string('token')->unique();
-            $table->timestamp('valido_ate');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('token_usuario')) {
+            Schema::create('token_usuario', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('usuario_id')->constrained('usuario')->cascadeOnDelete();
+                $table->string('token')->unique();
+                $table->timestamp('valido_ate');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

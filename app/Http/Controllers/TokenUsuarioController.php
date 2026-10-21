@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Api\V1\SimpleItemResource;
 use App\Http\Resources\Api\V1\TokenUsuarioResource;
 use App\Models\TokenUsuario;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,32 @@ class TokenUsuarioController extends Controller
         return TokenUsuarioResource::collection(
             TokenUsuario::query()
                 ->where('usuario_id', $request->user()->getAuthIdentifier())
+                ->latest('id')
+                ->paginate(),
+        );
+    }
+
+    public function listar_tokens_usuario(Request $request): AnonymousResourceCollection
+    {
+        return $this->index($request);
+    }
+
+    public function listar_tokens_usuario_simples(Request $request): AnonymousResourceCollection
+    {
+        return $this->simpleIndex($request);
+    }
+
+    public function salvar_token_usuario(Request $request): JsonResponse
+    {
+        return $this->store($request);
+    }
+
+    public function simpleIndex(Request $request): AnonymousResourceCollection
+    {
+        return SimpleItemResource::collection(
+            TokenUsuario::query()
+                ->where('usuario_id', $request->user()->getAuthIdentifier())
+                ->select(['id', 'usuario_id', 'valido_ate'])
                 ->latest('id')
                 ->paginate(),
         );
@@ -58,8 +85,10 @@ class TokenUsuarioController extends Controller
 
     public function update(Request $request, int $tokenUsuario): TokenUsuarioResource
     {
+        $required = $request->isMethod('PUT') ? ['required'] : ['sometimes', 'required'];
+
         $validated = $request->validate([
-            'valido_ate' => ['sometimes', 'required', 'date', 'after:now'],
+            'valido_ate' => [...$required, 'date', 'after:now'],
         ]);
 
         $token = $this->findOwnedToken($request, $tokenUsuario);
@@ -73,6 +102,24 @@ class TokenUsuarioController extends Controller
         return new TokenUsuarioResource($token->refresh());
     }
 
+    public function ver_token_usuario(Request $request): TokenUsuarioResource
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        return $this->show($request, (int) $validated['id']);
+    }
+
+    public function alterar_token_usuario(Request $request): TokenUsuarioResource
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        return $this->update($request, (int) $validated['id']);
+    }
+
     public function destroy(Request $request, int $tokenUsuario): Response
     {
         $token = $this->findOwnedToken($request, $tokenUsuario);
@@ -80,6 +127,15 @@ class TokenUsuarioController extends Controller
         $token->delete();
 
         return response()->noContent();
+    }
+
+    public function deletar_token_usuario(Request $request): Response
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        return $this->destroy($request, (int) $validated['id']);
     }
 
     public function logout(Request $request): Response

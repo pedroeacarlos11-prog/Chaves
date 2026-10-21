@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('retiradas', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('usuario_id')->constrained('usuario')->cascadeOnDelete();
-            $table->string('bloco', 80);
-            $table->string('sala', 120);
-            $table->date('data_retirada');
-            $table->time('hora_retirada');
-            $table->time('hora_devolucao')->nullable();
-            $table->string('status', 20)->default('em_uso');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('retiradas')) {
+            Schema::create('retiradas', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('usuario_id')->constrained('usuario')->cascadeOnDelete();
+                $table->string('bloco', 80);
+                $table->string('sala', 120);
+                $table->date('data_retirada');
+                $table->time('hora_retirada');
+                $table->time('hora_devolucao')->nullable();
+                $table->string('status', 20)->default('em_uso');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

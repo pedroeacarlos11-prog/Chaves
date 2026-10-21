@@ -1,0 +1,2751 @@
+{
+  "info": {
+    "_postman_id": "80c8e322-cabb-4585-8940-ee96d336d8e7",
+    "name": "Chaves API",
+    "description": "Baseada na Collection exportada do Thunder Client. Selecione o ambiente Chaves API - Local. As rotas protegidas herdam Bearer {{token}}. Login e o teste sem token não enviam Authorization.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const now = new Date();",
+          "const localDate = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, \"0\"), String(now.getDate()).padStart(2, \"0\")].join(\"-\");",
+          "const mysqlDateTime = function (date) {",
+          "    const datePart = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, \"0\"), String(date.getDate()).padStart(2, \"0\")].join(\"-\");",
+          "    const timePart = [String(date.getHours()).padStart(2, \"0\"), String(date.getMinutes()).padStart(2, \"0\"), String(date.getSeconds()).padStart(2, \"0\")].join(\":\");",
+          "    return datePart + \" \" + timePart;",
+          "};",
+          "pm.environment.set(\"dataTeste\", localDate);",
+          "pm.environment.set(\"dataHoraTeste\", now.toISOString());",
+          "pm.environment.set(\"tokenValidoAte\", mysqlDateTime(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)));",
+          "pm.environment.set(\"tokenValidoAteAtualizado\", mysqlDateTime(new Date(Date.now() + 730 * 24 * 60 * 60 * 1000)));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{loginEmail}}\",\n  \"senha\": \"{{loginSenha}}\",\n  \"device_name\": \"Thunder Client\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"login retorna token Bearer e usuário\", function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.access_token).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(body.token_type).to.eql(\"Bearer\");",
+                  "  pm.expect(body.usuario).to.be.an(\"object\");",
+                  "  pm.environment.set(\"token\", body.access_token);",
+                  "  pm.environment.set(\"usuarioAutenticadoId\", String(body.usuario.id));",
+                  "  [\"funcionarioId\", \"chaveId\", \"emprestimoId\", \"usuarioId\", \"retiradaId\", \"tokenUsuarioId\", \"logEmprestimoId\"].forEach(function (key) { pm.environment.set(key, \"\"); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - sem token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "if (401 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"sem token é rejeitado\", function () { pm.expect(pm.response.json().message).to.eql(\"Unauthenticated.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ver usuário por ID (rota existente; não é /me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/ver_usuario?id={{usuarioAutenticadoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"retorna o usuário solicitado sem senha\", function () { const body = pm.response.json(); pm.expect(body.usuario).to.be.an(\"object\"); pm.expect(body.usuario.id).to.eql(Number(pm.environment.get(\"usuarioAutenticadoId\"))); pm.expect(body.usuario).not.to.have.property(\"senha\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Funcionários",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Funcionário de teste Thunder\",\n  \"email\": \"{{funcionarioEmail}}\",\n  \"cargo\": \"Teste\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"funcionarioEmail\", \"funcionario.postman.\" + Date.now() + \"@example.test\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"funcionarioId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/{{funcionarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Funcionário Thunder atualizado\",\n  \"email\": \"{{funcionarioEmail}}\",\n  \"cargo\": \"Teste atualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cargo\": \"Cargo atualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaves",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome_chave\": \"Chave de teste Thunder\",\n  \"localizacao\": \"Local de teste\",\n  \"status\": \"Disponível\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"chaveId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/{{chaveId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/{{chaveId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome_chave\": \"Chave Thunder atualizada\",\n  \"localizacao\": \"Local de teste atualizado\",\n  \"status\": \"Disponível\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"localizacao\": \"Local sem identificação\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/{{chaveId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"localizacao\": \"Local atualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Empréstimos",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funcionario_id\": \"{{funcionarioId}}\",\n  \"chave_id\": \"{{chaveId}}\",\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"emprestimoId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - devolução sem data e horário (422)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Devolvido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funcionario_id\": \"{{funcionarioId}}\",\n  \"chave_id\": \"{{chaveId}}\",\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\",\n  \"data_devolucao\": \"{{dataTeste}}\",\n  \"hora_devolucao\": \"10:15\",\n  \"status\": \"Devolvido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funcionario_id\": 99999999,\n  \"chave_id\": 99999999,\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - funcionário e chave inexistentes (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funcionario_id\": 99999999,\n  \"chave_id\": 99999999,\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Devolvido\",\n  \"data_devolucao\": \"{{dataTeste}}\",\n  \"hora_devolucao\": \"10:15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário de teste Thunder\",\n  \"email\": \"{{usuarioEmail}}\",\n  \"senha\": \"{{usuarioSenha}}\",\n  \"cpf\": \"{{usuarioCpf}}\",\n  \"data_nascimento\": \"2000-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const runId = Date.now();",
+                  "pm.environment.set(\"usuarioEmail\", \"usuario.postman.\" + runId + \"@example.test\");",
+                  "pm.environment.set(\"usuarioCpf\", String(10000000000 + Math.floor(Math.random() * 89999999999)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"usuarioId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário Thunder atualizado\",\n  \"email\": \"{{usuarioEmail}}\",\n  \"senha\": \"{{usuarioSenha}}\",\n  \"cpf\": \"{{usuarioCpf}}\",\n  \"data_nascimento\": \"2000-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"\",\n  \"email\": \"invalido\",\n  \"senha\": \"123\",\n  \"data_nascimento\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nome atualizado pelo Thunder\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Retiradas",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloco\": \"Bloco de teste\",\n  \"sala\": \"Sala de teste\",\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\",\n  \"status\": \"em_uso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"retiradaId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/{{retiradaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/{{retiradaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloco\": \"Bloco atualizado\",\n  \"sala\": \"Sala atualizada\",\n  \"data_retirada\": \"{{dataTeste}}\",\n  \"hora_retirada\": \"08:30\",\n  \"hora_devolucao\": \"10:15\",\n  \"status\": \"devolvida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloco\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/{{retiradaId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"devolvida\",\n  \"hora_devolucao\": \"10:15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/retiradas/{{retiradaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tokens de usuário",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_name\": \"Thunder Client\",\n  \"valido_ate\": \"{{tokenValidoAte}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.token_usuario || body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"tokenUsuarioId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valido_ate\": \"{{tokenValidoAteAtualizado}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valido_ate\": \"2020-01-01T00:00:00-03:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valido_ate\": \"{{tokenValidoAteAtualizado}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Logs de empréstimo",
+      "item": [
+        {
+          "name": "GET - listar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - listar simples",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/simples"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"listagem contém data como array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST - criar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emprestimo_id\": \"{{emprestimoId}}\",\n  \"acao\": \"Registro de teste Thunder\",\n  \"data_hora\": \"{{dataHoraTeste}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "if (201 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"criação guarda ID\", function () {",
+                  "  const body = pm.response.json();",
+                  "  const record = body.data || body;",
+                  "  pm.expect(record.id).to.exist;",
+                  "  pm.environment.set(\"logEmprestimoId\", String(record.id));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET - buscar por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"consulta contém objeto data\", function () { pm.expect(pm.response.json().data).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT - atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emprestimo_id\": \"{{emprestimoId}}\",\n  \"acao\": \"Registro atualizado pelo Thunder\",\n  \"data_hora\": \"{{dataHoraTeste}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - ID inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/99999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "if (404 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"404 contém mensagem JSON\", function () { pm.expect(pm.response.json().message).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negativo - payload inválido (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emprestimo_id\": 99999999,\n  \"acao\": \"Teste de vínculo inválido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "if (422 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"erro de validação tem JSON errors\", function () { const body = pm.response.json(); pm.expect(body.message).to.be.a(\"string\"); pm.expect(body.errors).to.be.an(\"object\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH - atualização parcial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"acao\": \"Ação atualizada pelo Thunder\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "if (200 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Finalização (execute por último)",
+      "item": [
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/emprestimos/{{emprestimoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/chaves/{{chaveId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE - excluir registro de teste",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/funcionarios/{{funcionarioId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 204\", function () { pm.response.to.have.status(204); });",
+                  "if (204 !== 204) {",
+                  "  pm.test(\"resposta JSON válida\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "}",
+                  "pm.test(\"logout esvazia resposta e limpa token\", function () { pm.expect(pm.response.text()).to.eql(\"\"); pm.environment.unset(\"token\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

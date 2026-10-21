@@ -2,83 +2,104 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Api\V1\FuncionarioResource;
 use App\Models\Funcionario;
-use Illuminate\Database\QueryException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Validation\Rule;
-use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
 
 class FuncionarioController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function salvar_funcionario(Request $request)
     {
-        return FuncionarioResource::collection(
-            Funcionario::query()->orderBy('nome')->orderBy('id')->paginate(),
-        );
-    }
-
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'nome' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('funcionario', 'email')],
-            'cargo' => ['sometimes', 'nullable', 'string', 'max:255'],
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|',
+            'cargo' => 'required|string|',
         ]);
-
-        return (new FuncionarioResource(Funcionario::create($validated)))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
-    }
-
-    public function show(Funcionario $funcionario): FuncionarioResource
-    {
-        return new FuncionarioResource($funcionario);
-    }
-
-    public function update(Request $request, Funcionario $funcionario): FuncionarioResource
-    {
-        $validated = $request->validate([
-            'nome' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => [
-                'sometimes',
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('funcionario', 'email')->ignore($funcionario->getKey()),
-            ],
-            'cargo' => ['sometimes', 'nullable', 'string', 'max:255'],
-        ]);
-
-        $funcionario->update($validated);
-
-        return new FuncionarioResource($funcionario->refresh());
-    }
-
-    public function destroy(Funcionario $funcionario): Response
-    {
-        if ($funcionario->emprestimos()->exists()) {
-            return response()->json([
-                'message' => 'Não é possível excluir funcionário vinculado a empréstimos.',
-            ], Response::HTTP_CONFLICT);
-        }
 
         try {
-            $funcionario->delete();
-        } catch (QueryException) {
-            return response()->json([
-                'message' => 'Não é possível excluir funcionário vinculado a empréstimos.',
-            ], Response::HTTP_CONFLICT);
-        }
+            $funcionario = new Funcionario;
+            $funcionario->nome = $request->nome;
+            $funcionario->email = $request->email;
+            $funcionario->cargo = $request->cargo;
 
-        return response()->noContent();
+            $funcionario->save();
+
+            return response()->json(['message' => 'Funcionário cadastrado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao cadastrar funcionário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
+        }
     }
 
-    public function cadastro_html(): View
+    public function ver_funcionario(Request $request)
     {
-        return view('cadastro_funcionario');
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+        $funcionario = Funcionario::find($request->id);
+        if ($funcionario) {
+            return response()->json(['funcionario' => $funcionario, 'erro' => 'n'], 200);
+        } else {
+            return response()->json(['message' => 'Funcionário não encontrado!', 'erro' => 's'], 200);
+        }
+    }
+
+    public function listar_funcionarios(Request $request)
+    {
+        $funcionarios = Funcionario::all();
+
+        return response()->json(['funcionarios' => $funcionarios], 200);
+    }
+
+    public function listar_funcionarios_simples(Request $request)
+    {
+        $funcionarios = Funcionario::select('nome', 'email')->get();
+
+        return response()->json(['funcionarios' => $funcionarios], 200);
+    }
+
+    public function alterar_funcionario(Request $request)
+    {
+
+        $request->validate([
+            'id' => 'required|integer|exists:funcionario,id',
+            'nome' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|',
+            'cargo' => 'required|string|',
+        ]);
+
+        try {
+
+            $funcionario = Funcionario::find($request->id);
+
+            if ($funcionario->email != $request->cpf) {
+                $funcionario_email_igual = Funcionario::where('email', $request->email)->first();
+                if ($funcionario_email_igual) {
+                    return response()->json(['message' => 'Email já cadastrado!', 'erro' => 's'], 200);
+                }
+            }
+            $funcionario->nome = $request->nome;
+            $funcionario->email = $request->email;
+            $funcionario->cargo = $request->cargo;
+            $funcionario->save();
+
+            return response()->json(['message' => 'Funcionário alterado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao alterar funcionário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
+        }
+    }
+
+    public function deletar_funcionario(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:funcionario,id',
+        ]);
+
+        try {
+            $funcionario = Funcionario::find($request->id);
+            $funcionario->delete();
+
+            return response()->json(['message' => 'Funcionário deletado com sucesso!', 'erro' => 'n'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Erro ao deletar funcionário!', 'erro' => 's', 'msg_erro' => $th->getMessage()], 200);
+        }
     }
 }

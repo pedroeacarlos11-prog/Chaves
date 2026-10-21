@@ -17,7 +17,7 @@
             'inicio' => 'Painel de Controle',
             'agenda' => 'Agenda de Retirada',
             'emprestimos' => 'Gerenciamento de Empréstimos',
-            'usuarios' => 'Gerenciamento de Usuários',
+            'funcionarios' => 'Cadastro de Funcionários',
             'chaves' => 'Controle de Chaves',
         ];
     @endphp
@@ -39,7 +39,7 @@
                     <a class="nav-link {{ $page === 'inicio' ? 'active' : '' }}" href="{{ route('inicio') }}"><i class="bi bi-house-door"></i><span>Início</span></a>
                     <a class="nav-link {{ $page === 'agenda' ? 'active' : '' }}" href="{{ route('agenda') }}"><i class="bi bi-calendar3"></i><span>Agenda</span></a>
                     <a class="nav-link {{ $page === 'emprestimos' ? 'active' : '' }}" href="{{ route('emprestimos') }}"><i class="bi bi-clipboard-check"></i><span>Empréstimos</span></a>
-                    <a class="nav-link {{ $page === 'usuarios' ? 'active' : '' }}" href="{{ route('usuarios') }}"><i class="bi bi-people"></i><span>Usuários</span></a>
+                    <a class="nav-link {{ $page === 'funcionarios' ? 'active' : '' }}" href="{{ route('funcionarios') }}"><i class="bi bi-people"></i><span>Funcionários</span></a>
                     <a class="nav-link {{ $page === 'chaves' ? 'active' : '' }}" href="{{ route('chaves') }}"><i class="bi bi-key"></i><span>Chaves</span></a>
                 </nav>
 
@@ -59,18 +59,15 @@
                 <div class="topbar-account">
                     <div class="dropdown">
                         <button class="notification-button btn" id="notificacoesDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Abrir notificações">
-                            <i class="bi bi-bell"></i><span class="notification-dot"></span>
+                                <i class="bi bi-bell"></i>@if ($stats['emprestimos_atrasados'] > 0)<span class="notification-dot"></span>@endif
                         </button>
                         <div class="dropdown-menu dropdown-menu-end p-3 shadow" aria-labelledby="notificacoesDropdown">
                             <div class="dropdown-header d-flex justify-content-between align-items-center px-0">
-                                <strong class="text-dark">Notificações</strong>
-                                <span class="badge rounded-pill text-bg-danger">1</span>
+                                <strong class="text-dark">Empréstimos atrasados</strong>
+                                <span class="badge rounded-pill text-bg-danger">{{ $stats['emprestimos_atrasados'] }}</span>
                             </div>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item d-flex gap-2 align-items-start text-wrap px-0 py-2" href="{{ route('emprestimos') }}">
-                                <i class="bi bi-clock-history text-danger mt-1"></i>
-                                <span><strong class="d-block">Empréstimo atrasado</strong><small class="text-body-secondary">Chave 02 · João Victor</small></span>
-                            </a>
+                            <p class="small text-body-secondary mb-2">{{ $stats['emprestimos_atrasados'] > 0 ? 'Consulte os registros marcados como atrasados.' : 'Não há empréstimos marcados como atrasados.' }}</p>
                             <a class="btn btn-primary btn-sm w-100 mt-2" href="{{ route('emprestimos') }}">Ver empréstimos</a>
                         </div>
                     </div>
@@ -103,6 +100,12 @@
                 @if (session('status'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('status') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
                     </div>
                 @endif

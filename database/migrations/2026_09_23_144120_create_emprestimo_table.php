@@ -10,12 +10,10 @@ return new class extends Migration
     {
         Schema::create('emprestimo', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('funcionario_id')
-                ->constrained('funcionario');
-
-            $table->foreignId('chave_id')
-                ->constrained('chave');
+            $table->unsignedBigInteger('funcionario_id');
+            $table->foreignId('funcionario_id')->references('id')->on('funcionario')->onDelete('cascade');
+            $table->unsignedBigInteger('chave_id');
+            $table->foreignId('chave_id')->references('id')->on('chave')->onDelete('cascade');
 
             $table->date('data_retirada')->nullable();
             $table->time('hora_retirada')->nullable();
@@ -30,6 +28,14 @@ return new class extends Migration
 
     public function down(): void
     {
+        Schema::table('emprestimo', function (Blueprint $table) {
+            $table->dropForeign(['funcionario_id']);
+            $table->dropColumn(['funcionario_id']);
+            $table->dropForeign(['chave_id']);
+            $table->dropColumn(['chave_id']);
+        });
+
         Schema::dropIfExists('emprestimo');
+
     }
 };

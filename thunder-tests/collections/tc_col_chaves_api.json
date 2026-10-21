@@ -1,0 +1,2381 @@
+﻿{
+    "_id":  "a1000000-0000-4000-8000-000000000001",
+    "colName":  "Controle de Chaves - API v1",
+    "created":  "2026-10-19T12:00:00.000Z",
+    "sortNum":  10000,
+    "folders":  [
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000002",
+                        "name":  "Autenticação",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  10000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000006",
+                        "name":  "Funcionários",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  20000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000015",
+                        "name":  "Chaves",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  30000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000024",
+                        "name":  "Empréstimos",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  40000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000035",
+                        "name":  "Usuários",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  50000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000044",
+                        "name":  "Retiradas",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  60000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000053",
+                        "name":  "Tokens de usuário",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  70000
+                    },
+                    {
+                        "_id":  "a1000000-0000-4000-8000-000000000062",
+                        "name":  "Logs de empréstimo",
+                        "containerId":  "",
+                        "created":  "2026-10-19T12:00:00.000Z",
+                        "sortNum":  80000
+                    }
+                ],
+    "requests":  [
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000003",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000002",
+                         "name":  "Login",
+                         "url":  "{{baseUrl}}/login",
+                         "method":  "POST",
+                         "sortNum":  10000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"email\": \"{{loginEmail}}\",\n  \"senha\": \"{{loginSenha}}\",\n  \"device_name\": \"Thunder Client\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000004",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000002",
+                         "name":  "Logout",
+                         "url":  "{{baseUrl}}/logout",
+                         "method":  "POST",
+                         "sortNum":  20000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000005",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000002",
+                         "name":  "Negativo - sem token",
+                         "url":  "{{baseUrl}}/funcionarios",
+                         "method":  "GET",
+                         "sortNum":  30000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000007",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/funcionarios",
+                         "method":  "GET",
+                         "sortNum":  40000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000008",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+                         "method":  "GET",
+                         "sortNum":  50000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000009",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/funcionarios",
+                         "method":  "POST",
+                         "sortNum":  60000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"Funcionário de teste Thunder\",\n  \"email\": \"{{funcionarioEmail}}\",\n  \"cargo\": \"Teste\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000010",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+                         "method":  "PUT",
+                         "sortNum":  70000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"Funcionário Thunder atualizado\",\n  \"email\": \"{{funcionarioEmail}}\",\n  \"cargo\": \"Teste atualizado\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000011",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+                         "method":  "PATCH",
+                         "sortNum":  80000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"cargo\": \"Cargo atualizado\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000012",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/funcionarios/{{funcionarioId}}",
+                         "method":  "DELETE",
+                         "sortNum":  90000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000013",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/funcionarios/99999999",
+                         "method":  "GET",
+                         "sortNum":  100000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000014",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/funcionarios",
+                         "method":  "POST",
+                         "sortNum":  110000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000016",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/chaves",
+                         "method":  "GET",
+                         "sortNum":  120000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000017",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/chaves/{{chaveId}}",
+                         "method":  "GET",
+                         "sortNum":  130000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000018",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/chaves",
+                         "method":  "POST",
+                         "sortNum":  140000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome_chave\": \"Chave de teste Thunder\",\n  \"localizacao\": \"Local de teste\",\n  \"status\": \"Disponível\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000019",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/chaves/{{chaveId}}",
+                         "method":  "PUT",
+                         "sortNum":  150000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome_chave\": \"Chave Thunder atualizada\",\n  \"localizacao\": \"Local de teste atualizado\",\n  \"status\": \"Disponível\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000020",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/chaves/{{chaveId}}",
+                         "method":  "PATCH",
+                         "sortNum":  160000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"localizacao\": \"Local atualizado\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000021",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/chaves/{{chaveId}}",
+                         "method":  "DELETE",
+                         "sortNum":  170000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000022",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/chaves/99999999",
+                         "method":  "GET",
+                         "sortNum":  180000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000023",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/chaves",
+                         "method":  "POST",
+                         "sortNum":  190000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"localizacao\": \"Local sem identificação\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000025",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/emprestimos",
+                         "method":  "GET",
+                         "sortNum":  200000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000026",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+                         "method":  "GET",
+                         "sortNum":  210000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000027",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/emprestimos",
+                         "method":  "POST",
+                         "sortNum":  220000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"funcionario_id\": \"{{funcionarioId}}\",\n  \"chave_id\": \"{{chaveId}}\",\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000028",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+                         "method":  "PUT",
+                         "sortNum":  230000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"funcionario_id\": \"{{funcionarioId}}\",\n  \"chave_id\": \"{{chaveId}}\",\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\",\n  \"data_devolucao\": \"2026-10-19\",\n  \"hora_devolucao\": \"10:15\",\n  \"status\": \"Devolvido\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000029",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+                         "method":  "PATCH",
+                         "sortNum":  240000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"status\": \"Devolvido\",\n  \"data_devolucao\": \"2026-10-19\",\n  \"hora_devolucao\": \"10:15\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000030",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+                         "method":  "DELETE",
+                         "sortNum":  250000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000031",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/emprestimos/99999999",
+                         "method":  "GET",
+                         "sortNum":  260000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000032",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/emprestimos",
+                         "method":  "POST",
+                         "sortNum":  270000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"funcionario_id\": 99999999,\n  \"chave_id\": 99999999,\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000033",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "Negativo - funcionário e chave inexistentes (422)",
+                         "url":  "{{baseUrl}}/emprestimos",
+                         "method":  "POST",
+                         "sortNum":  280000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"funcionario_id\": 99999999,\n  \"chave_id\": 99999999,\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000034",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "Negativo - devolução sem data e horário (422)",
+                         "url":  "{{baseUrl}}/emprestimos/{{emprestimoId}}",
+                         "method":  "PATCH",
+                         "sortNum":  290000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"status\": \"Devolvido\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000036",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/usuarios",
+                         "method":  "GET",
+                         "sortNum":  300000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000037",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/usuarios/{{usuarioId}}",
+                         "method":  "GET",
+                         "sortNum":  310000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000038",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/usuarios",
+                         "method":  "POST",
+                         "sortNum":  320000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"Usuário de teste Thunder\",\n  \"email\": \"{{usuarioEmail}}\",\n  \"senha\": \"{{usuarioSenha}}\",\n  \"cpf\": \"99999999999\",\n  \"data_nascimento\": \"2000-01-01\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000039",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/usuarios/{{usuarioId}}",
+                         "method":  "PUT",
+                         "sortNum":  330000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"Usuário Thunder atualizado\",\n  \"email\": \"{{usuarioEmail}}\",\n  \"cpf\": \"99999999999\",\n  \"data_nascimento\": \"2000-01-01\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000040",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/usuarios/{{usuarioId}}",
+                         "method":  "PATCH",
+                         "sortNum":  340000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"Nome atualizado pelo Thunder\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000041",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/usuarios/{{usuarioId}}",
+                         "method":  "DELETE",
+                         "sortNum":  350000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000042",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/usuarios/99999999",
+                         "method":  "GET",
+                         "sortNum":  360000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000043",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/usuarios",
+                         "method":  "POST",
+                         "sortNum":  370000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"nome\": \"\",\n  \"email\": \"invalido\",\n  \"senha\": \"123\",\n  \"data_nascimento\": \"\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000045",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/retiradas",
+                         "method":  "GET",
+                         "sortNum":  380000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000046",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/retiradas/{{retiradaId}}",
+                         "method":  "GET",
+                         "sortNum":  390000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000047",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/retiradas",
+                         "method":  "POST",
+                         "sortNum":  400000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"bloco\": \"Bloco de teste\",\n  \"sala\": \"Sala de teste\",\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\",\n  \"status\": \"em_uso\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000048",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/retiradas/{{retiradaId}}",
+                         "method":  "PUT",
+                         "sortNum":  410000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"bloco\": \"Bloco atualizado\",\n  \"sala\": \"Sala atualizada\",\n  \"data_retirada\": \"2026-10-19\",\n  \"hora_retirada\": \"08:30\",\n  \"hora_devolucao\": \"10:15\",\n  \"status\": \"devolvida\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000049",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/retiradas/{{retiradaId}}",
+                         "method":  "PATCH",
+                         "sortNum":  420000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"status\": \"devolvida\",\n  \"hora_devolucao\": \"10:15\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000050",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/retiradas/{{retiradaId}}",
+                         "method":  "DELETE",
+                         "sortNum":  430000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000051",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/retiradas/99999999",
+                         "method":  "GET",
+                         "sortNum":  440000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000052",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/retiradas",
+                         "method":  "POST",
+                         "sortNum":  450000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"bloco\": \"\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000054",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/tokens-usuario",
+                         "method":  "GET",
+                         "sortNum":  460000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000055",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+                         "method":  "GET",
+                         "sortNum":  470000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000056",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/tokens-usuario",
+                         "method":  "POST",
+                         "sortNum":  480000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"device_name\": \"Thunder Client\",\n  \"valido_ate\": \"2030-12-31T23:59:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000057",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+                         "method":  "PUT",
+                         "sortNum":  490000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"valido_ate\": \"2031-12-31T23:59:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000058",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+                         "method":  "PATCH",
+                         "sortNum":  500000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"valido_ate\": \"2031-12-31T23:59:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000059",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/tokens-usuario/{{tokenUsuarioId}}",
+                         "method":  "DELETE",
+                         "sortNum":  510000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000060",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/tokens-usuario/99999999",
+                         "method":  "GET",
+                         "sortNum":  520000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000061",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/tokens-usuario",
+                         "method":  "POST",
+                         "sortNum":  530000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"valido_ate\": \"2020-01-01T00:00:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000063",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "GET - listar",
+                         "url":  "{{baseUrl}}/logs-emprestimos",
+                         "method":  "GET",
+                         "sortNum":  540000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000064",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "GET - buscar por ID",
+                         "url":  "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+                         "method":  "GET",
+                         "sortNum":  550000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000065",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "POST - criar",
+                         "url":  "{{baseUrl}}/logs-emprestimos",
+                         "method":  "POST",
+                         "sortNum":  560000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"emprestimo_id\": \"{{emprestimoId}}\",\n  \"acao\": \"Registro de teste Thunder\",\n  \"data_hora\": \"2026-10-19T10:15:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000066",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "PUT - atualizar",
+                         "url":  "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+                         "method":  "PUT",
+                         "sortNum":  570000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"emprestimo_id\": \"{{emprestimoId}}\",\n  \"acao\": \"Registro atualizado pelo Thunder\",\n  \"data_hora\": \"2026-10-19T10:30:00-03:00\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000067",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "PATCH - atualização parcial",
+                         "url":  "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+                         "method":  "PATCH",
+                         "sortNum":  580000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"acao\": \"Ação atualizada pelo Thunder\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000068",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "DELETE - excluir registro de teste",
+                         "url":  "{{baseUrl}}/logs-emprestimos/{{logEmprestimoId}}",
+                         "method":  "DELETE",
+                         "sortNum":  590000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000069",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "Negativo - ID inexistente (404)",
+                         "url":  "{{baseUrl}}/logs-emprestimos/99999999",
+                         "method":  "GET",
+                         "sortNum":  600000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000070",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "Negativo - payload inválido (422)",
+                         "url":  "{{baseUrl}}/logs-emprestimos",
+                         "method":  "POST",
+                         "sortNum":  610000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ],
+                         "body":  {
+                                      "type":  "json",
+                                      "raw":  "{\n  \"emprestimo_id\": 99999999,\n  \"acao\": \"Teste de vínculo inválido\"\n}",
+                                      "form":  [
+
+                                               ]
+                                  }
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000072",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000006",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/funcionarios/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000073",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000015",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/chaves/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000074",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000024",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/emprestimos/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000075",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000035",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/usuarios/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000076",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000044",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/retiradas/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000077",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000053",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/tokens-usuario/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     },
+                     {
+                         "_id":  "a1000000-0000-4000-8000-000000000078",
+                         "colId":  "a1000000-0000-4000-8000-000000000001",
+                         "containerId":  "a1000000-0000-4000-8000-000000000062",
+                         "name":  "GET - listar simples",
+                         "url":  "{baseUrl}/logs-emprestimos/simples",
+                         "method":  "GET",
+                         "sortNum":  700000,
+                         "created":  "2026-10-19T12:00:00.000Z",
+                         "modified":  "2026-10-19T12:00:00.000Z",
+                         "headers":  [
+                                         {
+                                             "name":  "Accept",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Content-Type",
+                                             "value":  "application/json",
+                                             "isDisabled":  false
+                                         },
+                                         {
+                                             "name":  "Authorization",
+                                             "value":  "Bearer {{token}}",
+                                             "isDisabled":  false
+                                         }
+                                     ],
+                         "params":  [
+
+                                    ]
+                     }
+                 ]
+}
